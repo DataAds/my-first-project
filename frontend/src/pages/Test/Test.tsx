@@ -1,8 +1,18 @@
 export default function Test() {
   return (
-    <div style={{ padding: "20px", background: "#eef" }}>
-      <h1>Я точно здесь!</h1>
-      <p>Если ты это видишь, значит роутер работает правильно 🚀</p>
+    <div style={{ padding: "40px", background: "#eef" }}>
+      <h1>Тестовая страница</h1>
+      <button
+        style={{
+          padding: "10px 20px",
+          background: "blue",
+          color: "white",
+          borderRadius: "8px",
+        }}
+        onClick={() => alert("Кнопка работает!")}
+      >
+        Нажми меня
+      </button>
     </div>
   );
 }
