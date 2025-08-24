@@ -11,7 +11,7 @@ import Settings from "../pages/Settings/Settings";
 import Users from "../pages/Users/Users";
 import Billing from "../pages/Billing/Billing";
 
-// ✅ импорт новой тестовой страницы
+// ✅ импорт новой страницы
 import Test from "../pages/Test/Test";
 
 export const router = createBrowserRouter([
@@ -26,6 +26,6 @@ export const router = createBrowserRouter([
   { path: "/users", element: <Users /> },
   { path: "/billing", element: <Billing /> },
 
-  // ✅ новый роут для теста кнопки
+  // ✅ новый роут
   { path: "/test", element: <Test /> },
 ]);
