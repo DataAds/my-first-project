@@ -11,6 +11,9 @@ import Settings from "../pages/Settings/Settings";
 import Users from "../pages/Users/Users";
 import Billing from "../pages/Billing/Billing";
 
+// ✅ импорт новой тестовой страницы
+import Test from "../pages/Test/Test";
+
 export const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
@@ -22,4 +25,7 @@ export const router = createBrowserRouter([
   { path: "/settings", element: <Settings /> },
   { path: "/users", element: <Users /> },
   { path: "/billing", element: <Billing /> },
+
+  // ✅ новый роут для теста кнопки
+  { path: "/test", element: <Test /> },
 ]);
