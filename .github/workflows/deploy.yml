@@ -23,14 +23,14 @@ jobs:
             cd /var/www/dataads
             git pull
 
-# --- frontend build ---
-cd frontend
-npm install
-npm run build
+            # --- frontend build ---
+            cd frontend
+            npm install
+            npm run build
 
-# Переносим собранный билд в правильное место
-rm -rf /var/www/dataads/frontend/build
-cp -r build /var/www/dataads/frontend/
+            # Переносим собранный билд в правильное место
+            rm -rf /var/www/dataads/frontend/build
+            cp -r build /var/www/dataads/frontend/
 
             # --- backend ---
             cd /var/www/dataads/backend
