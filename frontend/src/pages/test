@@ -1,12 +1,1 @@
-import { Button } from "@/components/ui/Button";
-
-export default function Test() {
-  return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold">Тестовая страница</h1>
-      <Button onClick={() => alert("Работает!")}>
-        Нажми меня
-      </Button>
-    </div>
-  );
-}
+frontend/src/pages/Test/Test.tsx
