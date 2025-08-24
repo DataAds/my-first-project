@@ -5,7 +5,7 @@ export default function Test() {
   return (
     <Page title="Тестовая страница">
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Привет из DataAds 🎉</h1>
+        <h2 className="text-xl font-bold mb-4">Привет из DataAds 🎉</h2>
         <Button onClick={() => alert("Кнопка работает!")}>
           Нажми меня
         </Button>
@@ -13,3 +13,4 @@ export default function Test() {
     </Page>
   );
 }
+
