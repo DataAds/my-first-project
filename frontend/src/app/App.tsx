@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/Button";
 export default function App() {
   return (
     <div>
-      <h1>DataAds App</h1>
+      <h1 className="text-2xl font-bold">DataAds App</h1>
       <Button onClick={() => alert("Кнопка работает!")}>
         Нажми меня
       </Button>
 
-      {/* Здесь твой роутер */}
+      {/* Оставляем твой роутер */}
       <RouterProvider router={router} />
     </div>
   );
 }
+
