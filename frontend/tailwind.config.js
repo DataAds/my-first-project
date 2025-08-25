@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  content: ["./public/index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -14,11 +14,14 @@ module.exports = {
         },
         info: {
           50:'#d2f5fb',100:'#a5ecf7',200:'#79e2f3',300:'#4cd9ee',
-          400:'#1fcfea',500:'#1fcfea',
-          600:'#12abc2',700:'#0e8092',800:'#095561',900:'#052b31'
+          400:'#1fcfea',500:'#1fcfea',600:'#12abc2',700:'#0e8092',800:'#095561',900:'#052b31'
         },
       },
+      borderRadius: {
+        xl: "0.75rem",
+        '2xl': "1rem"
+      }
     },
   },
   plugins: [],
-}
+};
