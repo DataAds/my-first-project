@@ -3,7 +3,7 @@ import MainLayout from "./MainLayout";
 
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
-import ResetPassword from "../pages/Auth/ResetPassword";
+import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import WorkspaceSelect from "../pages/WorkspaceSelect/WorkspaceSelect";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Campaigns from "../pages/Campaigns/Campaigns";
@@ -18,17 +18,18 @@ export const router = createBrowserRouter([
     path: "/",
     element: <MainLayout />,
     children: [
-      { path: "login", element: <Login /> },
-      { path: "register", element: <Register /> },
-      { path: "reset-password", element: <ResetPassword /> },
-      { path: "workspaces", element: <WorkspaceSelect /> },
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "campaigns", element: <Campaigns /> },
-      { path: "integrations", element: <Integrations /> },
-      { path: "settings", element: <Settings /> },
-      { path: "users", element: <Users /> },
-      { path: "billing", element: <Billing /> },
-      { path: "playground", element: <Playground /> },
+      { path: "/login", element: <Login /> },
+      { path: "/register", element: <Register /> },
+      { path: "/reset-password", element: <ResetPassword /> },
+      { path: "/workspaces", element: <WorkspaceSelect /> },
+      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/campaigns", element: <Campaigns /> },
+      { path: "/integrations", element: <Integrations /> },
+      { path: "/settings", element: <Settings /> },
+      { path: "/users", element: <Users /> },
+      { path: "/billing", element: <Billing /> },
+      { path: "/playground", element: <Playground /> },
     ],
   },
 ]);
+
