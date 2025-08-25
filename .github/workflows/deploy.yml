@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:
@@ -12,8 +12,35 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: SSH build & release switch
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install deps & build (frontend)
+        working-directory: frontend
+        run: |
+          npm ci || npm install
+          npm run build
+
+      - name: Pack build
+        run: tar -czf build.tgz -C frontend build
+
+      - name: Upload build to VPS (scp)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "build.tgz"
+          target: "/tmp"
+
+      - name: Release switch on VPS (ssh)
         uses: appleboy/ssh-action@v0.1.10
         env:
           SHA_SHORT: ${{ github.sha }}
@@ -25,32 +52,29 @@ jobs:
           script: |
             set -euo pipefail
 
-            echo "[GIT] pull"
-            cd /var/www/dataads
-            git pull
+            # 1) Папки релизов
+            mkdir -p /var/www/dataads/releases
 
-            echo "[FRONT] build"
-            cd frontend
-            npm ci || npm install
-            npm run build
-
-            echo "[RELEASE] publish"
+            # 2) Имя релиза по короткому SHA
             REL="/var/www/dataads/releases/${SHA_SHORT:0:7}"
             mkdir -p "$REL"
-            rsync -a --delete build/ "$REL/"
 
+            # 3) Распаковать артефакт в релиз (срезать верхний каталог "build")
+            tar -xzf /tmp/build.tgz -C "$REL" --strip-components=1
+
+            # 4) Права (диры 755, файлы 644)
             find "$REL" -type d -exec chmod 755 {} \;
             find "$REL" -type f -exec chmod 644 {} \;
 
+            # 5) Зонд и переключение симлинка
             echo "OK $(date -Iseconds)" > "$REL/__probe__.txt"
-
-            echo "[SWITCH] current -> $REL"
             ln -sfn "$REL" /var/www/dataads/current
 
-            echo "[NGINX] reload"
+            # 6) Перезагрузить nginx и проверить
             nginx -t
-            sudo systemctl reload nginx
+            systemctl reload nginx
 
-            echo "[CHECK]"
+            echo "--- CHECK ---"
             curl -I -s https://dataads.online/ | head -n1
             curl -I -s https://dataads.online/__probe__.txt | head -n1
+
