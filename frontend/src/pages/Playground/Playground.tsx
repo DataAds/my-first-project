@@ -3,10 +3,12 @@ import { Button } from "../../components/ui/Button";
 
 export default function Playground() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Playground</h1>
+    <div style={{ padding: 24 }}>
+      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
+        Playground
+      </h1>
 
-      <p className="mb-4 text-gray-600">
+      <p style={{ marginBottom: 16, color: "#555" }}>
         Здесь можно протестировать компоненты.
       </p>
 
