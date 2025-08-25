@@ -1,4 +1,3 @@
-
 name: Deploy to VPS
 
 on:
@@ -16,14 +15,10 @@ jobs:
     steps:
       - name: SSH build & release switch
         uses: appleboy/ssh-action@v0.1.10
-        envs: SHA
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs_format: export
-          envs: |
-            SHA=${{ github.sha }}
           script: |
             set -euo pipefail
 
@@ -37,7 +32,8 @@ jobs:
             npm run build
 
             echo "[RELEASE] publish"
-            REL="/var/www/dataads/releases/${SHA:0:7}"
+            TS=$(date +%Y%m%d%H%M%S)
+            REL="/var/www/dataads/releases/$TS"
             mkdir -p "$REL"
             rsync -a --delete build/ "$REL/"
 
@@ -45,7 +41,7 @@ jobs:
             find "$REL" -type d -exec chmod 755 {} \;
             find "$REL" -type f -exec chmod 644 {} \;
 
-            # зонд для проверки
+            # health-check файл
             echo "OK $(date -Iseconds)" > "$REL/__probe__.txt"
 
             echo "[SWITCH] current -> $REL"
@@ -56,7 +52,6 @@ jobs:
             sudo systemctl reload nginx
 
             echo "[CHECK]"
-            curl -I -s https://dataads.online/           | head -n1
+            curl -I -s https://dataads.online/ | head -n1
             curl -I -s https://dataads.online/index.html | head -n1
             curl -I -s https://dataads.online/__probe__.txt | head -n1
-
