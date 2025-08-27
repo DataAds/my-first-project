@@ -29,7 +29,7 @@ jobs:
           npm run build
 
       - name: Pack build
-        run: tar -czf build.tgz -C frontend build
+        run: tar -czf site.tgz -C frontend build
 
       - name: Upload build to VPS (scp)
         uses: appleboy/scp-action@v0.1.7
@@ -37,7 +37,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "build.tgz"
+          source: "site.tgz"
           target: "/tmp"
 
       - name: Release switch on VPS (ssh)
@@ -52,32 +52,27 @@ jobs:
           script: |
             set -euo pipefail
 
-            # 1) Папки релизов
             mkdir -p /var/www/dataads/releases
-
-            # 2) Имя релиза по короткому SHA
             REL="/var/www/dataads/releases/${SHA_SHORT:0:7}"
             mkdir -p "$REL"
 
-            # 3) Распаковать артефакт в релиз (срезать верхний каталог "build")
-            tar -xzf /tmp/build.tgz -C "$REL" --strip-components=1
+            # распаковываем содержимое build/ в каталог релиза
+            tar -xzf /tmp/site.tgz -C "$REL" --strip-components=1
 
-            # 4) Права (диры 755, файлы 644)
+            # права
             find "$REL" -type d -exec chmod 755 {} \;
             find "$REL" -type f -exec chmod 644 {} \;
 
-            # 5) Зонд и переключение симлинка
+            # зонд и переключение симлинка
             echo "OK $(date -Iseconds)" > "$REL/__probe__.txt"
             ln -sfn "$REL" /var/www/dataads/current
 
-            # 6) Перезагрузить nginx и проверить
+            # на всякий — оставить только 5 последних релизов
+            ls -1dt /var/www/dataads/releases/* 2>/dev/null | tail -n +6 | xargs -r rm -rf
+
             nginx -t
             systemctl reload nginx
 
-            echo "--- CHECK ---"
+            echo "[CHECK]"
             curl -I -s https://dataads.online/ | head -n1
             curl -I -s https://dataads.online/__probe__.txt | head -n1
-            
-
-            
-
