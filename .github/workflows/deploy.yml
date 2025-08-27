@@ -17,62 +17,65 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install deps & build (frontend)
+      - name: Build frontend
         working-directory: frontend
         run: |
           npm ci || npm install
           npm run build
 
       - name: Pack build
-        run: tar -czf site.tgz -C frontend build
+        run: |
+          # Упаковываем папку build/ в корень архива
+          tar -czf site.tgz -C frontend build
 
       - name: Upload build to VPS (scp)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
+          username: ${{ secrets.SERVER_USER }}     # временно root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "site.tgz"
-          target: "/tmp"
+          source: site.tgz
+          target: /tmp
 
       - name: Release switch on VPS (ssh)
         uses: appleboy/ssh-action@v0.1.10
         env:
-          SHA_SHORT: ${{ github.sha }}
+          GIT_SHA: ${{ github.sha }}
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
+          username: ${{ secrets.SERVER_USER }}     # временно root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: SHA_SHORT
+          envs: GIT_SHA
           script: |
             set -euo pipefail
 
             mkdir -p /var/www/dataads/releases
-            REL="/var/www/dataads/releases/${SHA_SHORT:0:7}"
+            REL="/var/www/dataads/releases/${GIT_SHA:0:7}"
             mkdir -p "$REL"
 
-            # распаковываем содержимое build/ в каталог релиза
+            # распакуем содержимое build/ прямо в каталог релиза
             tar -xzf /tmp/site.tgz -C "$REL" --strip-components=1
 
-            # права
+            # права (директории 755, файлы 644)
             find "$REL" -type d -exec chmod 755 {} \;
             find "$REL" -type f -exec chmod 644 {} \;
 
-            # зонд и переключение симлинка
+            # зонд для быстрой проверки
             echo "OK $(date -Iseconds)" > "$REL/__probe__.txt"
+
+            # переключаем симлинк
             ln -sfn "$REL" /var/www/dataads/current
 
-            # на всякий — оставить только 5 последних релизов
-            ls -1dt /var/www/dataads/releases/* 2>/dev/null | tail -n +6 | xargs -r rm -rf
-
+            # перечитываем конфиги
             nginx -t
             systemctl reload nginx
 
             echo "[CHECK]"
             curl -I -s https://dataads.online/ | head -n1
             curl -I -s https://dataads.online/__probe__.txt | head -n1
+
